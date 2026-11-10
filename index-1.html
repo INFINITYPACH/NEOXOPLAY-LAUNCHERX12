@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080d1b">
+<meta name="description" content="NexoPlay: tu portal para descubrir y jugar videojuegos gratis directamente desde el navegador.">
+<title>NexoPlay | Juegos gratis</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#080d1b;--surface:#111a2d;--surface2:#172238;--text:#f4f7ff;
+  --muted:#9aa8c0;--border:rgba(255,255,255,.10);--accent:#8584ff;
+  --warning:#ffd166;--shadow:0 14px 38px rgba(0,0,0,.24);
+}
+@media(prefers-color-scheme:light){
+  :root{color-scheme:light;--bg:#f2f5fb;--surface:#fff;--surface2:#edf1f8;
+    --text:#172139;--muted:#69758b;--border:rgba(25,40,75,.13);
+    --accent:#555be8;--warning:#966000;--shadow:0 12px 32px rgba(30,50,90,.09)}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.container{width:min(1440px,100%);padding:0 26px;margin:auto}
+header{text-align:center;padding:72px 0 35px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;
+  border:1px solid var(--border);border-radius:999px;color:var(--muted);
+  font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}
+h1{margin:20px 0 0;font-size:clamp(36px,6vw,66px);line-height:1.06;
+  letter-spacing:-2.7px;font-weight:900;background:linear-gradient(100deg,#55d6ff,#8584ff,#d77bff);
+  color:transparent;background-clip:text;-webkit-background-clip:text}
+.subtitle{max-width:580px;margin:17px auto 0;color:var(--muted);font-size:15px;line-height:1.7}
+.search-area{max-width:680px;margin:0 auto 35px;position:relative}
+.search-area input{width:100%;padding:18px 20px 18px 54px;background:var(--surface);
+  border:1px solid var(--border);border-radius:17px;outline:none;color:var(--text);
+  font:inherit;font-size:15px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
+.search-area input::placeholder{color:var(--muted)}
+.search-area input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(133,132,255,.15)}
+.search-icon{position:absolute;left:19px;top:50%;transform:translateY(-50%);font-size:19px;pointer-events:none}
+.results-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  margin:0 0 18px;color:var(--muted);font-size:13px;font-weight:650}
+.results-count{color:var(--text)}
+.games-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;padding-bottom:70px}
+@media(min-width:700px){.games-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1100px){.games-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}}
+.game-card{display:flex;flex-direction:column;min-width:0;overflow:hidden;text-decoration:none;
+  color:var(--text);background:var(--surface);border:1px solid var(--border);
+  border-radius:17px;box-shadow:var(--shadow);transition:transform .22s ease,border-color .22s ease;
+  -webkit-tap-highlight-color:transparent}
+.game-card:hover{transform:translateY(-5px);border-color:var(--accent)}
+.game-card:active{transform:scale(.975)}
+.game-card:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.game-image{width:100%;aspect-ratio:4/3;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--c1),var(--c2))}
+.game-image img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%;position:relative;z-index:1;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.game-fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--c1),var(--c2));font-size:30px;color:#fff}
+.game-fallback::before{content:none}
+.game-number{position:absolute;top:11px;left:11px;z-index:2;min-width:31px;height:29px;
+  display:grid;place-items:center;padding:0 9px;border-radius:9px;
+  background:rgba(8,13,27,.82);border:1px solid rgba(255,255,255,.24);
+  color:#fff;font-size:12px;font-weight:850;backdrop-filter:blur(8px)}
+.game-content{padding:15px 16px 17px;display:flex;flex-direction:column;gap:8px;flex:1}
+.game-name{font-size:15px;line-height:1.4;font-weight:800;overflow-wrap:anywhere}
+.game-note{font-size:11px;line-height:1.5;color:var(--warning);font-weight:650}
+.empty{grid-column:1/-1;text-align:center;padding:55px 20px;background:var(--surface);
+  border:1px dashed var(--border);border-radius:17px;color:var(--muted)}
+.empty strong{display:block;color:var(--text);font-size:18px;margin-bottom:7px}
+footer{text-align:center;padding:0 0 35px;color:var(--muted);font-size:12px}
+@media(max-width:420px){
+  .container{padding:0 15px}header{padding:52px 0 28px}h1{letter-spacing:-1.7px}
+  .games-grid{gap:12px}.game-content{padding:12px 11px 14px}.game-name{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<header class="container">
+  <div class="eyebrow">🎮 NEXOPLAY · ARCADE ONLINE</div>
+  <h1>NEXOPLAY</h1>
+  <p class="subtitle">Tu portal de juegos gratis. Elige tu favorito y empieza a jugar.</p>
+</header>
+
+<main class="container">
+  <div class="search-area">
+    <span class="search-icon" aria-hidden="true">⌕</span>
+    <input id="search" type="search" placeholder="Buscar un juego..." aria-label="Buscar juegos" autocomplete="off">
+  </div>
+  <div class="results-bar">
+    <span>Explora la colección</span>
+    <span class="results-count" id="count" aria-live="polite">36 juegos</span>
+  </div>
+  <section class="games-grid" id="games" aria-label="Galería de juegos"></section>
+</main>
+<footer class="container">Selecciona una tarjeta para abrir el juego en una pestaña nueva.</footer>
+
+<script>
+// Edita aquí los juegos. Cada campo imagen contiene una portada o arte del juego.
+const juegos = [
+  {numero:1,nombre:"Call of Duty Black Ops Zombies",nota:"",enlace:"https://vel.gg/bo1z",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/42700/header.jpg",color1:"#263b52",color2:"#090d18"},
+  {numero:2,nombre:"Moon",nota:"",enlace:"https://moon-zombies.pages.dev",imagen:"https://i0.wp.com/fpsjp.net/wp-content/uploads/2015/10/Black-Ops-moon.jpg",color1:"#172b50",color2:"#080b1d"},
+  {numero:3,nombre:"Kino der Toten",nota:"",enlace:"https://kino-der-toten.pages.dev",imagen:"https://gdm-universal-media.b-cdn.net/gfinityesports/0fb3ae710d0722646e14c221ff3404f23302501c-2048x1152.jpg",color1:"#6a292d",color2:"#15111b"},
+  {numero:4,nombre:"Black Ops III Cheese Cube",nota:"",enlace:"https://cheese-cube.pages.dev",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/311210/header.jpg",color1:"#e5a82c",color2:"#74421e"},
+  {numero:5,nombre:"Black Ops II",nota:"",enlace:"https://vibeslops.luckeysystems.com",imagen:"https://madcapandco.com/cdn/shop/files/CallofDutyBlackOps2_2400x.jpg?v=1775584853",color1:"#45515d",color2:"#10151d"},
+  {numero:6,nombre:"Modern Warfare 2",nota:"",enlace:"https://ovz-game-production.up.railway.app",imagen:"https://media.gamestop.com/i/gamestop/10074392/Call-of-Duty-Modern-Warfare-2",color1:"#59624b",color2:"#151b19"},
+  {numero:7,nombre:"Skate 3",nota:"(Necesitas tus archivos del juego)",enlace:"https://skate.aaddpp.lol",imagen:"https://i5.walmartimages.ca/images/Enlarge/__8/408/8408.jpg",color1:"#b65e36",color2:"#34202a"},
+  {numero:8,nombre:"Skate Rust",nota:"",enlace:"https://global-terror.net",imagen:"https://i5.walmartimages.ca/images/Enlarge/__8/408/8408.jpg",color1:"#6c5543",color2:"#17191c"},
+  {numero:9,nombre:"CS Surf",nota:"",enlace:"https://surfd.net",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/10/header.jpg",color1:"#237c9c",color2:"#142449"},
+  {numero:10,nombre:"Halo CE",nota:"(Necesitas tus archivos del juego)",enlace:"https://mitchellhynes.com/halo",imagen:"https://retrofam.com/cdn/shop/files/1-front_result_e3d1a872-cd01-45a0-8eb3-f440e9a9a259.webp?v=1758104041&width=1080",color1:"#637c42",color2:"#17251d"},
+  {numero:11,nombre:"Halo CE (celular)",nota:"(Necesitas tus archivos del juego)",enlace:"https://hcemobile.com",imagen:"https://retrofam.com/cdn/shop/files/1-front_result_e3d1a872-cd01-45a0-8eb3-f440e9a9a259.webp?v=1758104041&width=1080",color1:"#5d7948",color2:"#17251d"},
+  {numero:12,nombre:"PES 6",nota:"",enlace:"https://pes6.optijuegos.net",imagen:"https://www.pesoccerworld.com/images/pes6/pes6_portada.jpg",color1:"#287a58",color2:"#102b32"},
+  {numero:13,nombre:"GTA V",nota:"",enlace:"https://web.archive.org/web/20261006055917/https://playgta5.com/",imagen:"https://images.launchbox-app.com/67ad2477-5f9e-43c4-9a56-a01d0c59717f.png",color1:"#a18a43",color2:"#29221c"},
+  {numero:14,nombre:"GTA Vice City",nota:"",enlace:"https://wasmarcade.com/vice-city",imagen:"https://cdn11.bigcommerce.com/s-ymgqt/images/stencil/1280x1280/products/21280/56896/vice---------1__14530.1712336913.jpg?c=2",color1:"#df6a9a",color2:"#493d91"},
+  {numero:15,nombre:"The Simpsons Hit & Run",nota:"",enlace:"https://shar-wasm.cjoseph.workers.dev/?skipmovie",imagen:"https://www.powerupgaming.ca/cdn/shop/products/53087_front.jpg?v=1730922427",color1:"#e7b52d",color2:"#d45d36"},
+  {numero:16,nombre:"Quake",nota:"",enlace:"https://q1.pieter.com",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/2310/header.jpg",color1:"#88452f",color2:"#21171b"},
+  {numero:17,nombre:"Quake II",nota:"",enlace:"https://q2.pieter.com",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/2320/header.jpg",color1:"#77704b",color2:"#25251e"},
+  {numero:18,nombre:"Quake III",nota:"",enlace:"https://q3.pieter.com",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/2200/header.jpg",color1:"#74404b",color2:"#211b2c"},
+  {numero:19,nombre:"Return to Castle Wolfenstein",nota:"",enlace:"https://rtcw.pieter.com",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/9010/header.jpg",color1:"#655747",color2:"#1d2025"},
+  {numero:20,nombre:"Urban Terror (no es Unreal Tournament)",nota:"",enlace:"https://ut.pieter.com",imagen:"https://storage.googleapis.com/wtfast-images-prod/urban%20terror-5506efd3-afd7-4ca0-b801-77d19a68b141.jpg",color1:"#55715d",color2:"#17232b"},
+  {numero:21,nombre:"Half-Life",nota:"(Probablemente necesitas tus archivos del juego)",enlace:"https://pixelsuft.github.io/hl/",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/70/header.jpg",color1:"#c58b35",color2:"#44301f"},
+  {numero:22,nombre:"Half-Life y CS 1.6",nota:"(Necesitas tus archivos del juego)",enlace:"https://x8bitrain.github.io/webXash/",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/70/header.jpg",color1:"#8b7548",color2:"#25251e"},
+  {numero:23,nombre:"Diablo",nota:"(Demo gratis incluida, para el juego completo necesitas tus archivos del juego)",enlace:"https://johnimril.github.io/diablo_web/",imagen:"https://psxdatacenter.com/images/hires/U/D/SLUS-00619/SLUS-00619-F-ALL.jpg",color1:"#8e302d",color2:"#1c1018"},
+  {numero:24,nombre:"Hedgewars",nota:"",enlace:"https://webwars.link",imagen:"https://cdn.akamai.steamstatic.com/steam/apps/2223810/header.jpg",color1:"#6c9c56",color2:"#244a58"},
+  {numero:25,nombre:"Más GTA y Minecraft",nota:"",enlace:"https://wasmarcade.com/",imagen:"https://images.launchbox-app.com/67ad2477-5f9e-43c4-9a56-a01d0c59717f.png",color1:"#5d9856",color2:"#294b73"},
+  {numero:26,nombre:"Dragon Ball Z Budokai Tenkaichi 3",nota:"(Incluye duelos en línea 1 contra 1)",enlace:"https://dragonballbt3.online/",imagen:"https://vignette.wikia.nocookie.net/dragonball/images/3/37/DBZ_Tenkaichi_3_Cover_2.jpg/revision/latest?cb=20131128201900",color1:"#e58b32",color2:"#9d3c2c"},
+  {numero:27,nombre:"PES 13",nota:"",enlace:"https://pes13.optijuegos.net/pes13",imagen:"https://psxdatacenter.com/psx2/images2/covers/SLUS-21955/SLUS-21955-F-ALL.jpg",color1:"#287a58",color2:"#102b32"},
+  {numero:28,nombre:"Need for Speed: Most Wanted Online",nota:"",enlace:"https://web.nfsmwo.com/",imagen:"https://www.vgdb.com.br/gf/fotos/games/media_56422/need-for-speed-most-wanted-2005-56422.jpg",color1:"#252b34",color2:"#080d1b"},
+  {numero:29,nombre:"Guitar Hero III: Legends of Rock",nota:"",enlace:"https://lasvegasherogame.com/gh3/",imagen:"https://gandoriongames.com/cdn/shop/products/Guitar_Hero_III_Legends_of_Rock_Sony_PlayStation_2_1200x1200.jpg?v=1774986220",color1:"#d85a20",color2:"#26120d"},
+  {numero:30,nombre:"PES 2011",nota:"",enlace:"https://pes11.optijuegos.net/",imagen:"https://www.pesoccerworld.com/images/pes2011/caratula_pes2011_ps2.jpg",color1:"#287a58",color2:"#102b32"},
+  {numero:31,nombre:"Super Mario 64",nota:"",enlace:"https://olivers.tools/play",imagen:"https://www.mariowiki.com/images/3/3e/Super_Mario_64_Boxart.png",color1:"#2874b8",color2:"#172b50"},
+  {numero:32,nombre:"Dragon Ball Zarpado: Budokai Tenkaichi 4",nota:"",enlace:"https://bt4.lauta.site/",imagen:"https://cdn2.steamgriddb.com/grid/80248776f6eae8e0aac68736a5faadd0.png",color1:"#1674d1",color2:"#10264a"},
+  {numero:33,nombre:"Tekken: Dark Resurrection",nota:"",enlace:"https://tekken.lauta.site/",imagen:"https://images.launchbox-app.com/r2_3f9ab387-3d6e-42cc-a5e5-126a594f8562.jpg",color1:"#d9e4ee",color2:"#171b24"},
+  {numero:33,nombre:"Geometry Dash",nota:"",enlace:"https://gd.lauta.site/",imagen:"https://imgs.crazygames.com/games/geometry-dash-online/cover_1x1-1732744370684.png?format=auto&metadata=none&quality=100&width=1200",color1:"#164b9b",color2:"#081b45"},
+  {numero:34,nombre:"Cuphead",nota:"",enlace:"https://cup.lauta.site/",imagen:"https://images.launchbox-app.com/daacd1bd-654d-4c43-a8ba-c8f669a17786.jpg",color1:"#c94735",color2:"#291a19"},
+  {numero:35,nombre:"Minecraft",nota:"",enlace:"https://wasmarcade.com/minecraft",imagen:"https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",color1:"#4b8b3b",color2:"#263f28"},
+  {numero:36,nombre:"Need for Speed Underground 2 - Carmeet",nota:"Paseos y encuentros de autos en línea",enlace:"https://carmeet.lf.wtf/",imagen:"https://images.cgames.de/images/gamestar/4/need-for-speed-underground-2_1778016.jpg",color1:"#276a8e",color2:"#111b2c"},
+  {numero:37,nombre:"Need for Speed Underground 2 - Revived",nota:"Versión de navegador",enlace:"https://nfsu2.xyz/",imagen:"https://images.cgames.de/images/gamestar/4/need-for-speed-underground-2_1778016.jpg",color1:"#276a8e",color2:"#111b2c"},
+  {numero:38,nombre:"Virtua Tennis 3 Online",nota:"Tenis en línea · PC y móvil",enlace:"https://vt3.online/",imagen:"https://cdn11.bigcommerce.com/s-ymgqt/images/stencil/1280x1280/products/51831/54735/nis3----------------------3__25999.1680630818.jpg?c=2",color1:"#3b79b9",color2:"#17254b"},
+  {numero:39,nombre:"GTA 3",nota:"",enlace:"https://wasmarcade.com/gta3",imagen:"https://upload.wikimedia.org/wikipedia/en/8/8e/Grand_Theft_Auto_III_cover.jpg",color1:"#b7a27d",color2:"#25201b"}
+];
+
+const grid = document.getElementById("games");
+const search = document.getElementById("search");
+const count = document.getElementById("count");
+
+// Crea una tarjeta; si la portada falla, conserva el fondo y el emoji.
+function crearTarjeta(juego) {
+  const a = document.createElement("a");
+  a.className = "game-card";
+  a.href = juego.enlace;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.setAttribute("aria-label", `${juego.numero}. ${juego.nombre}${juego.nota ? " " + juego.nota : ""}`);
+
+  const cover = document.createElement("div");
+  cover.className = "game-image";
+  cover.style.setProperty("--c1", juego.color1);
+  cover.style.setProperty("--c2", juego.color2);
+
+  const fallback = document.createElement("div");
+  fallback.className = "game-fallback";
+  fallback.textContent = "";
+  fallback.setAttribute("aria-hidden", "true");
+  cover.appendChild(fallback);
+
+  if (juego.imagen && juego.imagen.trim()) {
+    const img = document.createElement("img");
+    img.src = juego.imagen.trim();
+    img.alt = `Portada de ${juego.nombre}`;
+    img.loading = "lazy";
+    img.onerror = () => { img.remove(); fallback.style.display = "flex"; };
+    img.onload = () => { fallback.style.display = "none"; };
+    cover.appendChild(img);
+  }
+
+  const number = document.createElement("span");
+  number.className = "game-number";
+  number.textContent = juego.numero;
+  cover.appendChild(number);
+
+  const content = document.createElement("div");
+  content.className = "game-content";
+
+  const name = document.createElement("div");
+  name.className = "game-name";
+  name.textContent = juego.nombre;
+  content.appendChild(name);
+
+  if (juego.nota) {
+    const note = document.createElement("div");
+    note.className = "game-note";
+    note.textContent = juego.nota;
+    content.appendChild(note);
+  }
+
+  a.append(cover, content);
+  return a;
+}
+
+// Renderiza y filtra por nombre sin alterar el orden original.
+function renderizar(filtro = "") {
+  const termino = filtro.trim().toLocaleLowerCase("es");
+  const encontrados = juegos.filter(j => j.nombre.toLocaleLowerCase("es").includes(termino));
+  grid.replaceChildren();
+
+  count.textContent = `${encontrados.length} ${encontrados.length === 1 ? "juego" : "juegos"}`;
+
+  if (!encontrados.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    const title = document.createElement("strong");
+    title.textContent = "No encontramos juegos";
+    const message = document.createElement("span");
+    message.textContent = "Prueba con otro nombre o revisa la búsqueda.";
+    empty.append(title, message);
+    grid.appendChild(empty);
+    return;
+  }
+
+  encontrados.forEach(juego => grid.appendChild(crearTarjeta(juego)));
+}
+
+search.addEventListener("input", () => renderizar(search.value));
+renderizar();
+</script>
+</body>
+</html>
